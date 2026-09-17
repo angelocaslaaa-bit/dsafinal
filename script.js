@@ -2122,13 +2122,13 @@ function setReservationDefaultDates() {
 
     const billiardDate =
         document.getElementById(
-            "billiardResDate"
+            "bResDate"
         );
 
 
     const ktvDate =
         document.getElementById(
-            "ktvResDate"
+            "kResDate"
         );
 
 
@@ -2586,6 +2586,25 @@ function createReservation(
 
 
 /* =========================================================
+   CREATE RESERVATION BUTTON DISPATCHER
+   Matches current HTML onclick="handleCreateReservation(...)"
+========================================================= */
+
+function handleCreateReservation(type) {
+
+    if (type === "Billiard") {
+        handleCreateBilliardReservation();
+        return;
+    }
+
+    if (type === "KTV") {
+        handleCreateKTVReservation();
+    }
+
+}
+
+
+/* =========================================================
    CREATE BILLIARD RESERVATION
 ========================================================= */
 
@@ -2597,27 +2616,30 @@ function handleCreateBilliardReservation() {
             "Billiard",
 
         customerId:
-            "billiardResCustomer",
+            "bResCustomer",
 
         contactId:
-            "billiardResContact",
+            "bResContact",
 
         facilityId:
-            "billiardResTable",
+            "bResFacilitySelect",
 
         dateId:
-            "billiardResDate",
+            "bResDate",
 
         timeId:
-            "billiardResStartTime",
+            "bResStartTime",
 
         durationId:
-            "billiardResDuration",
+            "bResDurationSelect",
 
         messageId:
-            "billiardResMsg"
+            "bResMsg"
 
     });
+
+
+    renderBilliardReservations();
 
 }
 
@@ -2634,27 +2656,30 @@ function handleCreateKTVReservation() {
             "KTV",
 
         customerId:
-            "ktvResCustomer",
+            "kResCustomer",
 
         contactId:
-            "ktvResContact",
+            "kResContact",
 
         facilityId:
-            "ktvResRoom",
+            "kResFacilitySelect",
 
         dateId:
-            "ktvResDate",
+            "kResDate",
 
         timeId:
-            "ktvResStartTime",
+            "kResStartTime",
 
         durationId:
-            "ktvResDuration",
+            "kResDurationSelect",
 
         messageId:
-            "ktvResMsg"
+            "kResMsg"
 
     });
+
+
+    renderKTVReservations();
 
 }
 
@@ -2690,9 +2715,9 @@ function handleStartReservationEarly(
         reservation.facilityType ===
             "Billiard"
 
-        ? "billiardResMsg"
+        ? "bResMsg"
 
-        : "ktvResMsg";
+        : "kResMsg";
 
 
     if (
@@ -2895,9 +2920,9 @@ function handleCancelReservation(
         reservation.facilityType ===
             "Billiard"
 
-        ? "billiardResMsg"
+        ? "bResMsg"
 
-        : "ktvResMsg";
+        : "kResMsg";
 
 
     showMsg(
@@ -2990,160 +3015,49 @@ function linearSearchReservation(
 ========================================================= */
 
 function handleBilliardReservationSearch() {
+    const input = document.getElementById("bResSearchInput");
+    if (!input) return;
 
-    const input =
-        document.getElementById(
-            "billiardResSearchInput"
-        );
+    const query = input.value.trim();
+    renderBilliardReservations(query);
 
-
-    if (!input) {
-
-        return;
-
+    const msg = document.getElementById("bResSearchMsg");
+    if (msg) {
+        msg.textContent = "";
+        msg.className = "msg";
     }
-
-
-    const query =
-        input.value.trim();
-
-
-    if (!query) {
-
-        showMsg(
-            "billiardResSearchMsg",
-            "Enter a customer name or reservation ID.",
-            "warn"
-        );
-
-        return;
-
-    }
-
-
-    const found =
-        linearSearchReservation(
-            query,
-            "Billiard"
-        );
-
-
-    if (!found) {
-
-        showMsg(
-            "billiardResSearchMsg",
-            "No matching billiard reservation found.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    showMsg(
-
-        "billiardResSearchMsg",
-
-        `${found.id} \u2014 ${found.customerName} \u2014 ` +
-        `${found.facilityName} \u2014 ${found.date} ` +
-        `${found.scheduledStart}-${found.scheduledEnd} \u2014 ` +
-        `\u20B1${found.price} \u2014 Status: ${found.status}`,
-
-        "success"
-
-    );
-
 }
-
-
-/* =========================================================
-   KTV RESERVATION SEARCH
-========================================================= */
 
 function handleKTVReservationSearch() {
+    const input = document.getElementById("kResSearchInput");
+    if (!input) return;
 
-    const input =
-        document.getElementById(
-            "ktvResSearchInput"
-        );
+    const query = input.value.trim();
+    renderKTVReservations(query);
 
-
-    if (!input) {
-
-        return;
-
+    const msg = document.getElementById("kResSearchMsg");
+    if (msg) {
+        msg.textContent = "";
+        msg.className = "msg";
     }
-
-
-    const query =
-        input.value.trim();
-
-
-    if (!query) {
-
-        showMsg(
-            "ktvResSearchMsg",
-            "Enter a customer name or reservation ID.",
-            "warn"
-        );
-
-        return;
-
-    }
-
-
-    const found =
-        linearSearchReservation(
-            query,
-            "KTV"
-        );
-
-
-    if (!found) {
-
-        showMsg(
-            "ktvResSearchMsg",
-            "No matching KTV reservation found.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    showMsg(
-
-        "ktvResSearchMsg",
-
-        `${found.id} \u2014 ${found.customerName} \u2014 ` +
-        `${found.facilityName} \u2014 ${found.date} ` +
-        `${found.scheduledStart}-${found.scheduledEnd} \u2014 ` +
-        `\u20B1${found.price} \u2014 Status: ${found.status}`,
-
-        "success"
-
-    );
-
 }
 
-/* =========================================================
-   BILLIARD & KTV MANAGEMENT SYSTEM
-   script.js \u2014 PART 2 OF 3
-   Continue directly after Part 1
-========================================================= */
+function handleReservationSearch(type) {
+    if (type === "Billiard") {
+        handleBilliardReservationSearch();
+        return;
+    }
 
+    if (type === "KTV") {
+        handleKTVReservationSearch();
+    }
+}
 
-/* =========================================================
-   RENDER BILLIARD RESERVATIONS
-========================================================= */
-
-function renderBilliardReservations() {
+function renderBilliardReservations(searchQuery = "") {
 
     const tbody =
         document.getElementById(
-            "billiardReservationsBody"
+            "bResReservationsBody"
         );
 
     if (!tbody) {
@@ -3152,10 +3066,20 @@ function renderBilliardReservations() {
 
     tbody.innerHTML = "";
 
+    const search = searchQuery.trim().toLowerCase();
+
     const list =
         reservations.filter(
             reservation =>
                 reservation.facilityType === "Billiard"
+                &&
+                (
+                    !search
+                    ||
+                    reservation.customerName.toLowerCase().includes(search)
+                    ||
+                    reservation.id.toLowerCase().includes(search)
+                )
         );
 
     if (list.length === 0) {
@@ -3206,10 +3130,6 @@ function renderBilliardReservations() {
                 </td>
 
                 <td>
-                    ${reservation.contact || "-"}
-                </td>
-
-                <td>
                     ${reservation.facilityName}
                 </td>
 
@@ -3236,18 +3156,15 @@ function renderBilliardReservations() {
                 </td>
 
                 <td>
-
                     <span
                         class="badge ${badgeClass}"
                     >
                         ${reservation.status}
                     </span>
+                </td>
 
-                    <div
-                        class="actions"
-                        style="margin-top:5px;"
-                    >
-
+                <td>
+                    <div class="actions">
                         ${
                             reservation.status ===
                             "Reserved"
@@ -3276,9 +3193,7 @@ function renderBilliardReservations() {
 
                             ""
                         }
-
                     </div>
-
                 </td>
 
             `;
@@ -3295,11 +3210,11 @@ function renderBilliardReservations() {
    RENDER KTV RESERVATIONS
 ========================================================= */
 
-function renderKTVReservations() {
+function renderKTVReservations(searchQuery = "") {
 
     const tbody =
         document.getElementById(
-            "ktvReservationsBody"
+            "kResReservationsBody"
         );
 
     if (!tbody) {
@@ -3308,10 +3223,20 @@ function renderKTVReservations() {
 
     tbody.innerHTML = "";
 
+    const search = searchQuery.trim().toLowerCase();
+
     const list =
         reservations.filter(
             reservation =>
                 reservation.facilityType === "KTV"
+                &&
+                (
+                    !search
+                    ||
+                    reservation.customerName.toLowerCase().includes(search)
+                    ||
+                    reservation.id.toLowerCase().includes(search)
+                )
         );
 
     if (list.length === 0) {
@@ -3362,10 +3287,6 @@ function renderKTVReservations() {
                 </td>
 
                 <td>
-                    ${reservation.contact || "-"}
-                </td>
-
-                <td>
                     ${reservation.facilityName}
                 </td>
 
@@ -3392,18 +3313,15 @@ function renderKTVReservations() {
                 </td>
 
                 <td>
-
                     <span
                         class="badge ${badgeClass}"
                     >
                         ${reservation.status}
                     </span>
+                </td>
 
-                    <div
-                        class="actions"
-                        style="margin-top:5px;"
-                    >
-
+                <td>
+                    <div class="actions">
                         ${
                             reservation.status ===
                             "Reserved"
@@ -3432,9 +3350,7 @@ function renderKTVReservations() {
 
                             ""
                         }
-
                     </div>
-
                 </td>
 
             `;
@@ -3578,7 +3494,7 @@ function handleStartWalkIn(
         facilities.find(
             facility =>
 
-                facility.type ===
+                facility.id ===
                     walkIn.facilityType
 
                 &&
@@ -3604,7 +3520,7 @@ function handleStartWalkIn(
 
             "wiMsg",
 
-            `No available ${walkIn.facilityType} facility right now. ${walkIn.customerName} remains in the queue.`,
+            `${walkIn.customerName}'s selected facility (${walkIn.facilityType}) is not available right now. The customer remains in the queue.`,
 
             "warn"
 
@@ -3636,7 +3552,7 @@ function handleStartWalkIn(
             freeFacility.name,
 
         facilityType:
-            walkIn.facilityType,
+            freeFacility.type,
 
         scheduledStart:
             null,
@@ -3655,7 +3571,7 @@ function handleStartWalkIn(
 
         baseSessionPrice:
             computePrice(
-                walkIn.facilityType,
+                freeFacility.type,
                 walkIn.durationMinutes
             ),
 
@@ -7904,12 +7820,12 @@ function exportSalesReportPDF() {
 function populateAllSelects() {
 
     populateFacilitySelect(
-        "billiardResTable",
+        "bResFacilitySelect",
         "Billiard"
     );
 
     populateFacilitySelect(
-        "ktvResRoom",
+        "kResFacilitySelect",
         "KTV"
     );
 
@@ -8027,7 +7943,7 @@ function updateReservationPricePreview(
     ) {
 
         durationId =
-            "billiardResDuration";
+            "bResDurationSelect";
 
         outputId =
             "billiardPricePreview";
@@ -8037,7 +7953,7 @@ function updateReservationPricePreview(
     else {
 
         durationId =
-            "ktvResDuration";
+            "kResDurationSelect";
 
         outputId =
             "ktvPricePreview";
@@ -8103,12 +8019,12 @@ function setupReservationPriceListeners() {
 
     const billiardDuration =
         document.getElementById(
-            "billiardResDuration"
+            "bResDurationSelect"
         );
 
     const ktvDuration =
         document.getElementById(
-            "ktvResDuration"
+            "kResDurationSelect"
         );
 
 
@@ -8321,7 +8237,7 @@ document.addEventListener(
         ----------------------------------------- */
 
         populateFacilitySelect(
-            "billiardResTable",
+            "bResFacilitySelect",
             "Billiard"
         );
 
@@ -8331,7 +8247,7 @@ document.addEventListener(
         ----------------------------------------- */
 
         populateFacilitySelect(
-            "ktvResRoom",
+            "kResFacilitySelect",
             "KTV"
         );
 

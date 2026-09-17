@@ -6661,6 +6661,8 @@ function handleCompletePayment() {
 
     renderHistory();
 
+    renderSalesReport();
+
     renderBillPreview();
 
 }
@@ -6694,7 +6696,7 @@ function renderReceiptActions(
 
         <button
             class="secondary"
-            onclick="viewTransaction('${transaction.id}')"
+            onclick="openTransactionFromBilling('${transaction.id}')"
         >
             View Transaction
         </button>
@@ -6707,6 +6709,14 @@ function renderReceiptActions(
 /* =========================================================
    FIND TRANSACTION
 ========================================================= */
+
+
+function openTransactionFromBilling(transactionId) {
+    showTab("history");
+    renderHistory();
+    viewTransaction(transactionId);
+}
+
 
 function findTransactionById(
     transactionId
@@ -6873,13 +6883,6 @@ function renderHistory() {
                 </td>
 
                 <td>
-
-                    <button
-                        class="small secondary"
-                        onclick="viewTransaction('${transaction.id}')"
-                    >
-                        View
-                    </button>
 
                     <button
                         class="small secondary"
@@ -7655,6 +7658,84 @@ function exportInventoryReportPDF() {
    SALES REPORT PDF
 ========================================================= */
 
+function renderSalesReport() {
+
+    const tbody = document.getElementById("salesReportBody");
+    const summary = document.getElementById("salesReportSummary");
+
+    if (!tbody) {
+        return;
+    }
+
+    const searchInput = document.getElementById("salesReportSearchInput");
+    const query = searchInput
+        ? searchInput.value.trim().toLowerCase()
+        : "";
+
+    let list = transactions;
+
+    if (query) {
+        list = transactions.filter(transaction => {
+            const values = [
+                transaction.id,
+                transaction.type,
+                transaction.customerName,
+                transaction.facilityName,
+                transaction.facilityType,
+                transaction.paymentMethod,
+                transaction.sourceType
+            ];
+
+            return values.some(value =>
+                String(value || "")
+                    .toLowerCase()
+                    .includes(query)
+            );
+        });
+    }
+
+    tbody.innerHTML = "";
+
+    if (list.length === 0) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td colspan="7" class="emptyState">
+                No completed transactions found.
+            </td>
+        `;
+        tbody.appendChild(row);
+    } else {
+        list.forEach(transaction => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${transaction.id}</td>
+                <td>${transaction.type}</td>
+                <td>${transaction.customerName}</td>
+                <td>${transaction.facilityName}</td>
+                <td>₱${transaction.grandTotal}</td>
+                <td>${transaction.paymentMethod}</td>
+                <td>${fmtDateTime(transaction.paidAt)}</td>
+            `;
+
+            tbody.appendChild(row);
+        });
+    }
+
+    if (summary) {
+        const totalSales = list.reduce(
+            (total, transaction) =>
+                total + Number(transaction.grandTotal || 0),
+            0
+        );
+
+        summary.textContent =
+            `Total Transactions: ${list.length} — Total Sales: ₱${totalSales}`;
+        summary.className = "msg success";
+    }
+}
+
+
 function exportSalesReportPDF() {
 
     const doc =
@@ -7857,6 +7938,8 @@ function renderAll() {
     renderInventory();
 
     renderHistory();
+
+    renderSalesReport();
 
     renderStaff();
 

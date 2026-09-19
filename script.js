@@ -1600,6 +1600,46 @@ function getSessionFeeTotal(
    HOME DASHBOARD
 ========================================================= */
 
+function getDashboardFacilityIcon(facility) {
+    if (facility.type === "Billiard") {
+        return `
+            <div class="facilityVisual billiardVisual" aria-hidden="true">
+                <div class="poolTableIcon">
+                    <span class="poolPocket p1"></span>
+                    <span class="poolPocket p2"></span>
+                    <span class="poolPocket p3"></span>
+                    <span class="poolPocket p4"></span>
+                    <span class="poolPocket p5"></span>
+                    <span class="poolPocket p6"></span>
+                    <span class="poolBall ball1"></span>
+                    <span class="poolBall ball2"></span>
+                    <span class="poolBall ball3"></span>
+                    <span class="poolCue"></span>
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="facilityVisual ktvVisual" aria-hidden="true">
+            <div class="ktvRoomIcon">
+                <div class="ktvScreen">KTV</div>
+                <div class="ktvSofa">
+                    <span class="sofaBack"></span>
+                    <span class="sofaSeat"></span>
+                    <span class="sofaArm sofaArmLeft"></span>
+                    <span class="sofaArm sofaArmRight"></span>
+                </div>
+                <div class="ktvMic">
+                    <span class="roomMicHead"></span>
+                    <span class="roomMicHandle"></span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+
 function renderDashboard() {
 
     const grid =
@@ -1770,7 +1810,9 @@ function renderDashboard() {
 
                 card.innerHTML = `
 
-                    <b>
+                    ${getDashboardFacilityIcon(facility)}
+
+                    <b class="facilityName">
                         ${facility.name}
                     </b>
 
@@ -1936,7 +1978,9 @@ function renderDashboard() {
 
                 card.innerHTML = `
 
-                    <b>
+                    ${getDashboardFacilityIcon(facility)}
+
+                    <b class="facilityName">
                         ${facility.name}
                     </b>
 
